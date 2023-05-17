@@ -10,5 +10,7 @@
 void send_analyzer_to_buffer();
 void get_reader_data_from_buffer();
 void analyze_data();
+void delete_data_from_reader();
+void free_analyzer_buffer();
 
 #endif

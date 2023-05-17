@@ -14,7 +14,7 @@ static int cpu_counter;
 //Function for saving data from reader to buffer
 void save_reader_data(char* data, size_t data_size)
 {
-    data_from_reader = (char *)calloc(data_size, sizeof(char));
+    data_from_reader = (char *)calloc(data_size, sizeof(data_from_reader));
     if(data_from_reader == NULL)
     {
         printf("%s","Error during memory allocation in  save_data_from_reader");
@@ -23,6 +23,7 @@ void save_reader_data(char* data, size_t data_size)
     {
         strncpy(data_from_reader,data,data_size);
     }
+    //free(data_from_reader);
 }
 //Function for saving data from analyzer to buffer 
 void save_analyzer_data(double cpu_percent_from_analyzer[], int cpu_counter_from_analyzer)
@@ -35,7 +36,7 @@ void save_analyzer_data(double cpu_percent_from_analyzer[], int cpu_counter_from
 //Sending data to analyzer by passing by reference
 void send_data_to_analyzer(char** reference_to_analyzer_buffer)
 {
-    *reference_to_analyzer_buffer = (char *) calloc(strlen(data_from_reader),sizeof(char));
+    *reference_to_analyzer_buffer = (char *) calloc(strlen(data_from_reader),sizeof(reference_to_analyzer_buffer));
     strncpy(*reference_to_analyzer_buffer,data_from_reader,strlen(data_from_reader));
 
 }

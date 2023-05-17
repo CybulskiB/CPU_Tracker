@@ -24,7 +24,7 @@ void analyze_data()
     while(proc_stat_line != NULL)
     {
         cpu_counter++;
-        char* line_copy = (char *) malloc(sizeof(char) * strlen(proc_stat_line));
+        char* line_copy = (char *) malloc(sizeof(line_copy) * strlen(proc_stat_line));
         strcpy(line_copy,proc_stat_line);
         cpu_use_info = strtok(line_copy,INFO_SEPARATOR);
         if(cpu_counter == 0)
@@ -43,6 +43,8 @@ void analyze_data()
         {
             printf("%s","Unexpected high number of cpu in analyze_data()");
         }
+
+        free(line_copy);
         
     }
 
@@ -55,4 +57,10 @@ void get_reader_data_from_buffer()
 void send_analyzer_to_buffer()
 {
     save_analyzer_data(cpu_percent,cpu_counter);
+}
+void free_analyzer_buffer()
+{
+    free(analyzer_internal_buffer);
+    analyzer_internal_buffer= NULL;
+
 }
