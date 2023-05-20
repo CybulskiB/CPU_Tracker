@@ -21,6 +21,7 @@ int main()
     char* test_contexts_pos = test_contexts;
     char* current_context; //During tokenizing malloc isn't necessary
     current_context = strtok_r(test_contexts,CONTEXTS_SEPARATOR,&test_contexts_pos);
+    init_buffer();
     while (i <= TESTS_NO)
     {
 
@@ -35,10 +36,11 @@ int main()
         //Checking connection reader -> buffer -> analyzer 
         assert(0 == strcmp(current_context,test_analyzer_buffer));
         free(test_analyzer_buffer);
+        reader_set_buffer(current_context);
+        send_reader_to_buffer();
 
         //Real analyzer getting data- analyzing and sending result to buffer
         get_reader_data_from_buffer();
-        delete_data_from_reader();
         analyze_data();
         send_analyzer_to_buffer();
 
@@ -66,5 +68,6 @@ int main()
         }
     }
     free(test_contexts);
+    destroy_buffer();
 
 }
