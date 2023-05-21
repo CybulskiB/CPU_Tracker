@@ -15,6 +15,9 @@ sem_t reader_analyzer_filled;
 sem_t analyzer_printer_empty;
 sem_t analyzer_printer_filled;
 
+pthread_mutex_t reader_analyzer_mutex;
+pthread_mutex_t analyzer_printer_mutex;
+
 static reader_analyzer_queue* ra_queue;
 static analyzer_printer_queue* ap_queue;
 
@@ -34,6 +37,11 @@ void init_buffer()
     sem_init(&analyzer_printer_empty,0,MAX_NO_DATA_FROM_ANALYZER);
     sem_init(&reader_analyzer_filled,0,0);
     sem_init(&analyzer_printer_filled,0,0);
+
+    //Mutexes initialization
+    pthread_mutex_init(&reader_analyzer_mutex, NULL);
+    pthread_mutex_init(&analyzer_printer_mutex,NULL);
+
 }
 
 //Function for free memory from buffer 
@@ -45,11 +53,15 @@ void destroy_buffer()
     sem_destroy(&reader_analyzer_filled);
     sem_destroy(&analyzer_printer_empty);
     sem_destroy(&analyzer_printer_filled); 
+    pthread_mutex_destroy(&reader_analyzer_mutex);
+    pthread_mutex_destroy(&analyzer_printer_mutex);
 }
 
 //Function for saving data from reader to buffer
 void save_reader_data(char* data, size_t data_size)
-{
+{   //Solution for producer consumer problem
+    sem_wait(&reader_analyzer_empty);
+    pthread_mutex_lock(&reader_analyzer_mutex);
     if(ra_queue->rear >= MAX_NO_DATA_FROM_READER -1 && ra_queue->front ==0)
     {
         printf("Error: attempt add data to full ra_queue");
@@ -76,11 +88,15 @@ void save_reader_data(char* data, size_t data_size)
             ra_queue->front =0;
         }
     }
+    pthread_mutex_unlock(&reader_analyzer_mutex);
+    sem_post(&reader_analyzer_filled);
 
 }
 //Function for saving data from analyzer to buffer 
 void save_analyzer_data(double cpu_percent_from_analyzer[], int cpu_counter_from_analyzer)
 {
+    sem_wait(&analyzer_printer_empty);
+    pthread_mutex_lock(&analyzer_printer_mutex);
     if(ap_queue->rear >= MAX_NO_DATA_FROM_ANALYZER -1 && ap_queue->front ==0)
     {
         printf("Error: attempt add data to full ap_queue\n");
@@ -99,10 +115,14 @@ void save_analyzer_data(double cpu_percent_from_analyzer[], int cpu_counter_from
             ap_queue->front =0;
         }
     }
+    pthread_mutex_unlock(&analyzer_printer_mutex);
+    sem_post(&analyzer_printer_filled);
 }
 //Sending data to analyzer by passing by reference
 void send_data_to_analyzer(char** reference_to_analyzer_buffer)
 {
+    sem_wait(&reader_analyzer_filled);
+    pthread_mutex_lock(&reader_analyzer_mutex);
     if(ra_queue->front > ra_queue->rear || ra_queue->front == -1)
     {
         printf("Error: Underflow in ra_queue\n");
@@ -114,10 +134,14 @@ void send_data_to_analyzer(char** reference_to_analyzer_buffer)
         free(ra_queue->data_from_reader[ra_queue->front]);
         ra_queue->front++;
     }
+    pthread_mutex_unlock(&reader_analyzer_mutex);
+    sem_post(&reader_analyzer_empty);
 }
 //Sending data to printer by passyng by reference
 void send_data_to_printer(double** reference_to_printer_buffer, int* reference_to_printer_cpu_no)
 {
+    sem_wait(&analyzer_printer_filled);
+    pthread_mutex_lock(&analyzer_printer_mutex);
     if(ap_queue->front > ap_queue->rear || ap_queue->front == -1)
     {
         printf("Error: Underflow in ap_queue\n");
@@ -128,6 +152,8 @@ void send_data_to_printer(double** reference_to_printer_buffer, int* reference_t
         memcpy(reference_to_printer_buffer,ap_queue->data_from_analyzer[ap_queue->front],sizeof(double) * (cpu_counter +1));
         ap_queue->front++;
     }
+    pthread_mutex_unlock(&analyzer_printer_mutex);
+    sem_post(&analyzer_printer_empty);
 }
 
 void refactor_ra_queue()

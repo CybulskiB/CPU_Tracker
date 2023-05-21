@@ -10,16 +10,28 @@
 static double cpu_to_print[CPU_MAX] ;
 static int cpu_counter;
 
+void* printer_task()
+{
+    while(1)
+    {
+        get_analyzer_data_from_buffer();
+        print_data();
+    }
+}
+
 
 //Function for print 
 void print_data()
 {
+    
+    //Print data
     if(cpu_counter >0){
         for(int i =1; i <= cpu_counter; i++)
         {
             printf("Cpu's core: %d,  Usage: %.2f%% \n", i,cpu_to_print[i]);
         }
         printf("Total number of core's : %d \n", cpu_counter);
+        printf( "\n \n \n");
     }
     else{
         printf("Error printer got cpu_counter = %d", cpu_counter);

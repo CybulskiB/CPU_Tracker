@@ -13,4 +13,6 @@ void analyze_data();
 void delete_data_from_reader();
 void free_analyzer_buffer();
 
+void* analyzer_task();
+
 #endif

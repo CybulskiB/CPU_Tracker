@@ -11,6 +11,19 @@
 static char* analyzer_internal_buffer = NULL;
 static double cpu_percent[CPU_MAX];
 static int cpu_counter;
+
+
+void* analyzer_task()
+{
+    while(1)
+    {
+        get_reader_data_from_buffer();
+        analyze_data();
+        send_analyzer_to_buffer();
+        free_analyzer_buffer();
+        
+    }
+}
 //Function for analyze
 void analyze_data()
 {

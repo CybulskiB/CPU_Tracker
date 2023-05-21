@@ -9,10 +9,20 @@
 
 static char* internal_buffer = NULL;
 
+//Reference to function for reader thread
+void* reader_task()
+{
+    while(1)
+    {
+        read_data();
+        send_reader_to_buffer();
+    }
+}
+
 //Function for reading data from file 
 int read_data()
 {
-    printf("Readed lines (for verify) : \n");
+  //  printf("Readed lines (for verify) : \n");
     FILE* file_info;
    
     //Calloc because with malloc I got some not cleared memory
@@ -43,7 +53,7 @@ int read_data()
             {
                 break;
             }
-            printf("%s \n",line);
+        //    printf("%s \n",line);
             strncat(internal_buffer,line,strlen(line));
         
         }
