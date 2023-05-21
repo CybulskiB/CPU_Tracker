@@ -7,19 +7,11 @@
 #include "../headers/reader.h"
 #include "../headers/buffer.h"
 #include "../headers/printer.h"
+#include "../headers/watchdog.h"
 
 int main()
 {
     init_buffer();
-    /*
-    read_data();
-    send_reader_to_buffer();
-    get_reader_data_from_buffer();
-    analyze_data();
-    send_analyzer_to_buffer();
-    free_analyzer_buffer();
-    get_analyzer_data_from_buffer();
-    print_data();*/
     pthread_t reader, analyzer, printer;
 
     if(pthread_create(&reader,NULL,reader_task,NULL) != 0)
@@ -35,6 +27,14 @@ int main()
         perror("Failed to create printer thread");
     }
 
+    pthread_t thread_to_watch[THREADS_TO_WATCH] = {reader,analyzer,printer};
+    watchdog_init(thread_to_watch,3);
+    pthread_t watchdog;
+
+    if(pthread_create(&watchdog,NULL,watchdog_task,NULL) != 0)
+    {
+        perror("Failed to create watchdog thread");
+    }
 
     if(pthread_join(reader,NULL) != 0)
     {
@@ -47,6 +47,10 @@ int main()
     if(pthread_join(printer,NULL) != 0)
     {
         perror("Failed to join printer thread");
+    }
+    if(pthread_join(watchdog,NULL) != 0)
+    {
+        perror("Failed to join watchdog thread");
     }
 
     destroy_buffer();

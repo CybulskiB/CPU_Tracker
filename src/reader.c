@@ -2,21 +2,28 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include<pthread.h>
 //Includes from my headers
 #include "../headers/reader.h"
 #include "../headers/global.h"
 #include "../headers/buffer.h"
+#include "../headers/watchdog.h"
 
 static char* internal_buffer = NULL;
 
 //Reference to function for reader thread
 void* reader_task()
 {
-    while(1)
+   /// int i = 0; for watchdog testing
+    while(1) //for example i <4 and i<1000 in other threads
     {
+        confirm_work(READER_ID);
         read_data();
         send_reader_to_buffer();
+        free_reader_buffer();
+       // i++;
     }
+    return NULL;
 }
 
 //Function for reading data from file 
@@ -67,15 +74,14 @@ int read_data()
 //Sending data to analyzer
 void send_reader_to_buffer()
 {
-    int internal_buffer_lo = strlen(internal_buffer);
-    char* data = (char*)calloc (internal_buffer_lo,sizeof(data));
-    strncpy(data,internal_buffer,internal_buffer_lo);
-    save_reader_data(data, strlen(data));
+  
+    save_reader_data(internal_buffer, strlen(internal_buffer));
+ 
+}
+void free_reader_buffer()
+{
     free(internal_buffer);
     internal_buffer = NULL;
-    free(data);
-    data = NULL;
-    
 }
 //Function for testing 
 void reader_set_buffer(char* to_buffer)

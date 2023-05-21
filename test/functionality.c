@@ -32,12 +32,14 @@ int main()
         //Simulation of analyzer buffer - malloc isn't necessary it is in send_data_to_analyzer
         char* test_analyzer_buffer = NULL; //(char *) malloc(MAX_SP_TEST_CONTEXTS_SIZE * sizeof(char ));
         send_data_to_analyzer(&test_analyzer_buffer);
+        free_reader_buffer();
 
         //Checking connection reader -> buffer -> analyzer 
         assert(0 == strcmp(current_context,test_analyzer_buffer));
         free(test_analyzer_buffer);
         reader_set_buffer(current_context);
         send_reader_to_buffer();
+        free_reader_buffer();
 
         //Real analyzer getting data- analyzing and sending result to buffer
         get_reader_data_from_buffer();

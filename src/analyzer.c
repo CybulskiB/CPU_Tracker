@@ -2,11 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 //Includes from my headers
 #include "../headers/analyzer.h"
 #include "../headers/global.h"
 #include "../headers/buffer.h"
+#include "../headers/watchdog.h"
 
 static char* analyzer_internal_buffer = NULL;
 static double cpu_percent[CPU_MAX];
@@ -15,14 +17,17 @@ static int cpu_counter;
 
 void* analyzer_task()
 {
-    while(1)
+    ///int i = 0; for watchdog testing
+    while(1) //for example i < 4 and i <1000 in other threads
     {
+        confirm_work(ANALYZER_ID);
         get_reader_data_from_buffer();
         analyze_data();
         send_analyzer_to_buffer();
         free_analyzer_buffer();
-        
+      //  i++;
     }
+    return NULL;
 }
 //Function for analyze
 void analyze_data()

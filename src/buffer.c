@@ -47,7 +47,14 @@ void init_buffer()
 //Function for free memory from buffer 
 void destroy_buffer()
 {
-    free(ra_queue);  
+    if(ra_queue->front <= ra_queue->rear)
+    {
+        for(int i = ra_queue->front; i<= ra_queue->rear; i++)
+        {
+            free(ra_queue->data_from_reader[i]);
+        }
+    }
+    free(ra_queue);
     free(ap_queue);
     sem_destroy(&reader_analyzer_empty);
     sem_destroy(&reader_analyzer_filled);
@@ -170,7 +177,7 @@ void refactor_ra_queue()
         int pos = 0;
         for(int i =0; i <= ra_queue->rear - ra_queue->front; i++)
         {
-            ra_queue->data_from_reader[i] = (char *) calloc(strlen(ra_queue->data_from_reader[ra_queue->front +i]), sizeof(char));
+            ra_queue->data_from_reader[i] = (char *) calloc(strlen(ra_queue->data_from_reader[ra_queue->front +i]), sizeof(ra_queue->data_from_reader[i]));
             strcpy(ra_queue->data_from_reader[i], ra_queue->data_from_reader[ra_queue->front +i]);
             free(ra_queue->data_from_reader[ra_queue->front +i]);
             pos =i;
