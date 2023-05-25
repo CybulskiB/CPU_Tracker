@@ -9,16 +9,18 @@
 #include "../headers/buffer.h"
 #include "../headers/global.h"
 #include "../headers/watchdog.h"
+#include "../headers/logger.h"
 
 static int watchdog_working = CONFIRMED;
 static int threads_alive[THREADS_TO_WATCH];
 pthread_t threads[THREADS_TO_WATCH];
+static char* error_message;
 
 void watchdog_init(pthread_t threads_from_main[], int threads_no)
 {
     if(threads_no != THREADS_TO_WATCH)
     {
-        printf("Error: Watchdog got unexpected number of threads");
+        save_logger_data("Error: Watchdog got unexpected number of threads");
     }
     else
     {
@@ -35,7 +37,10 @@ void* watchdog_task()
             if(threads_alive[i] == NON_CONFIRMED)
             {
                 watchdog_working = NON_CONFIRMED;
-                printf("Error: thread %d didn't confirm work \n", i);
+                error_message = (char *) malloc(sizeof(char*) *ERROR_MESSAGE_SIZE);
+                sprintf(error_message,"Error: thread %d didn't confirm work", i);
+                save_logger_data(error_message);
+                free(error_message);
                 stop_threads();
             }
             threads_alive[i] = NON_CONFIRMED;
@@ -47,7 +52,7 @@ void confirm_work(int thread_ID)
 {
     if(thread_ID >= THREADS_TO_WATCH)
     {
-        printf("Error: Watchdog got unexpected thread ID");
+        save_logger_data("Error: Watchdog got unexpected thread ID");
     }
     else
     {

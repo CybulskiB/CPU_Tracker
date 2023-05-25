@@ -8,19 +8,20 @@
 #include "../headers/global.h"
 #include "../headers/printer.h"
 #include "../headers/watchdog.h"
+#include "../headers/logger.h"
 
 static double cpu_to_print[CPU_MAX] ;
 static int cpu_counter;
+static char* error_message;
 
 void* printer_task()
 {
-   // int i = 0; for  watchdog testing
-    while(1) //for example i < 4 and in other threads i <1000
+   
+    while(1) 
     {
         confirm_work(PRINTER_ID);
         get_analyzer_data_from_buffer();
         print_data();
-       // i++;
     }
     return NULL;
 }
@@ -40,7 +41,11 @@ void print_data()
         printf( "\n \n \n");
     }
     else{
-        printf("Error printer got cpu_counter = %d", cpu_counter);
+        error_message = (char*)malloc(sizeof(char) * ERROR_MESSAGE_SIZE);
+        sprintf(error_message,"Error printer got cpu_counter = %d ", cpu_counter);
+        save_logger_data(error_message);
+        free(error_message);
+        
     }
 }
 

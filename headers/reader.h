@@ -2,6 +2,7 @@
 #define READER_H
 
 #define PROC_PATH "/proc/stat"
+#define MAX_ATTEMPTS 5
 
 int read_data();
 void save_reader_data();

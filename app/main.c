@@ -8,11 +8,12 @@
 #include "../headers/buffer.h"
 #include "../headers/printer.h"
 #include "../headers/watchdog.h"
+#include "../headers/logger.h"
 
 int main()
 {
     init_buffer();
-    pthread_t reader, analyzer, printer;
+    pthread_t reader, analyzer, printer, logger;
 
     if(pthread_create(&reader,NULL,reader_task,NULL) != 0)
     {
@@ -26,9 +27,13 @@ int main()
     {
         perror("Failed to create printer thread");
     }
+    if(pthread_create(&logger,NULL,logger_task,NULL) != 0)
+    {
+        perror("Faile to create logger thread");
+    }
 
-    pthread_t thread_to_watch[THREADS_TO_WATCH] = {reader,analyzer,printer};
-    watchdog_init(thread_to_watch,3);
+    pthread_t thread_to_watch[THREADS_TO_WATCH] = {reader,analyzer,printer,logger};
+    watchdog_init(thread_to_watch,THREADS_TO_WATCH);
     pthread_t watchdog;
 
     if(pthread_create(&watchdog,NULL,watchdog_task,NULL) != 0)
@@ -48,10 +53,15 @@ int main()
     {
         perror("Failed to join printer thread");
     }
+     if(pthread_join(logger,NULL) != 0)
+    {
+        perror("Faile to join logger thread");
+    }
     if(pthread_join(watchdog,NULL) != 0)
     {
         perror("Failed to join watchdog thread");
     }
+    
 
     destroy_buffer();
 

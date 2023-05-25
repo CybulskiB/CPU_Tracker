@@ -17,15 +17,15 @@ static int cpu_counter;
 
 void* analyzer_task()
 {
-    ///int i = 0; for watchdog testing
-    while(1) //for example i < 4 and i <1000 in other threads
+
+    while(1) 
     {
         confirm_work(ANALYZER_ID);
         get_reader_data_from_buffer();
         analyze_data();
         send_analyzer_to_buffer();
         free_analyzer_buffer();
-      //  i++;
+
     }
     return NULL;
 }
@@ -59,7 +59,7 @@ void analyze_data()
 
         if(cpu_counter > CPU_MAX)
         {
-            printf("%s","Unexpected high number of cpu in analyze_data()");
+            save_logger_data("Unexpected high number of cpu in analyze_data()");
         }
 
         free(line_copy);

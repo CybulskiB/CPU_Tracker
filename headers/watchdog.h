@@ -3,11 +3,12 @@
 
 #define TIME_TO_CHECK 2
 
-#define THREADS_TO_WATCH 3
+#define THREADS_TO_WATCH 4
 
 #define READER_ID 0
 #define ANALYZER_ID 1
 #define PRINTER_ID 2
+#define LOGGER_ID 3
 
 #define CONFIRMED 1
 #define NON_CONFIRMED 0

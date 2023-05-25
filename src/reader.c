@@ -2,26 +2,43 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include<pthread.h>
+#include <pthread.h>
 //Includes from my headers
 #include "../headers/reader.h"
 #include "../headers/global.h"
 #include "../headers/buffer.h"
 #include "../headers/watchdog.h"
+#include "../headers/logger.h"
 
 static char* internal_buffer = NULL;
+static char* error_message;
 
 //Reference to function for reader thread
 void* reader_task()
 {
-   /// int i = 0; for watchdog testing
-    while(1) //for example i <4 and i<1000 in other threads
+    size_t attempts_to_open = 0;
+    while(1) 
     {
+        
         confirm_work(READER_ID);
-        read_data();
-        send_reader_to_buffer();
-        free_reader_buffer();
-       // i++;
+        if(read_data() ==  SUCCESS)
+        {
+            send_reader_to_buffer();
+            free_reader_buffer();
+        }
+        else
+        {
+            free_reader_buffer();
+            if(attempts_to_open == MAX_ATTEMPTS)
+            {
+                save_logger_data("Unable to open file with proc info - reader exit");
+                break;
+            }
+            else
+            {
+                attempts_to_open +=1;
+            }
+        }
     }
     return NULL;
 }
@@ -38,15 +55,19 @@ int read_data()
     //In future version I will add proper info to Logger insted of printf
     if (internal_buffer == NULL)
     {
-        printf("%s","Error during memory allocation to internal_buffer in read_data");
-        return 1;
+        save_logger_data("Error during memory allocation to internal_buffer in read_data");
+        return FAIL;
     }
 
     file_info = fopen(PROC_PATH,"r");
     if(file_info == NULL)
     {
-        printf("%s",strcat("Couldn't open ",PROC_PATH));
-        return 1;
+        error_message = (char*) malloc(sizeof(char) * ERROR_MESSAGE_SIZE);
+        strcpy(error_message,"Couldn't open ");
+        strcat(error_message,PROC_PATH);
+        save_logger_data(error_message);
+        free(error_message);
+        return FAIL;
     }
 
     else
@@ -60,14 +81,14 @@ int read_data()
             {
                 break;
             }
-        //    printf("%s \n",line);
+        
             strncat(internal_buffer,line,strlen(line));
         
         }
         free(line);
         line = NULL;
         fclose(file_info);
-        return 0;        
+        return SUCCESS;        
     }
 }
 
