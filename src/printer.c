@@ -13,11 +13,12 @@
 static double cpu_to_print[CPU_MAX] ;
 static int cpu_counter;
 static char* error_message;
+int printer_control = WORKING;
 
 void* printer_task()
 {
    
-    while(1) 
+    while(printer_control) 
     {
         confirm_work(PRINTER_ID);
         get_analyzer_data_from_buffer();
@@ -53,4 +54,9 @@ void print_data()
 void get_analyzer_data_from_buffer()
 {
     send_data_to_printer((double **) &cpu_to_print, &cpu_counter);
+}
+
+void stop_printer()
+{
+    printer_control = END_THREAD;
 }

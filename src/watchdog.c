@@ -11,7 +11,7 @@
 #include "../headers/watchdog.h"
 #include "../headers/logger.h"
 
-static int watchdog_working = CONFIRMED;
+int watchdog_working = CONFIRMED;
 static int threads_alive[THREADS_TO_WATCH];
 pthread_t threads[THREADS_TO_WATCH];
 static char* error_message;
@@ -36,7 +36,7 @@ void* watchdog_task()
         {
             if(threads_alive[i] == NON_CONFIRMED)
             {
-                watchdog_working = NON_CONFIRMED;
+                stop_watchdog();
                 error_message = (char *) malloc(sizeof(char*) *ERROR_MESSAGE_SIZE);
                 sprintf(error_message,"Error: thread %d didn't confirm work", i);
                 save_logger_data(error_message);
@@ -67,4 +67,9 @@ void stop_threads()
     }
     free_reader_buffer();
     free_analyzer_buffer();
+    free_logger_buffer();
+}
+void stop_watchdog()
+{
+    watchdog_working = NON_CONFIRMED;
 }

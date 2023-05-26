@@ -6,8 +6,10 @@
 #define CPU_ID "cpu"
 
 #define SUCCESS 0
-
 #define FAIL 1
+
+#define END_THREAD 0
+#define WORKING 1
 
 
 #endif

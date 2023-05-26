@@ -229,21 +229,17 @@ void refactor_ap_queue()
 
 void send_data_to_logger(char** reference_to_logger_buffer)
 {
-    sem_wait(&logger_filled);
-    pthread_mutex_lock(&logger_queue_mutex);
-    if(log_queue->front > log_queue->rear || log_queue->front == -1)
+    if(log_queue->front != -1 && log_queue->front <= log_queue->rear)
     {
-        save_logger_data("Error: Underflow in ra_queue");
-    }
-    else
-    {
+        sem_wait(&logger_filled);
+        pthread_mutex_lock(&logger_queue_mutex);
         *reference_to_logger_buffer = (char *) calloc(strlen(log_queue->data_to_logger[log_queue->front]),sizeof(reference_to_logger_buffer));
         strncpy(*reference_to_logger_buffer,log_queue->data_to_logger[log_queue->front],strlen(log_queue->data_to_logger[log_queue->front]));
         free(log_queue->data_to_logger[log_queue->front]);
         log_queue->front++;
+        pthread_mutex_unlock(&logger_queue_mutex);
+        sem_post(&logger_empty);
     }
-    pthread_mutex_unlock(&logger_queue_mutex);
-    sem_post(&logger_empty);
 }
 //Function for saving data to logger queue
 void save_logger_data(char* data)

@@ -5,7 +5,8 @@
 
 void* logger_task();
 void get_logs();
-void free_logger_internal_buffer();
+void free_logger_buffer();
+void stop_logger();
 
 #define ERROR_MESSAGE_SIZE 100
 

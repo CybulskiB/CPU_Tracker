@@ -12,12 +12,13 @@
 
 static char* internal_buffer = NULL;
 static char* error_message;
+int reader_control = WORKING;
 
 //Reference to function for reader thread
 void* reader_task()
 {
     size_t attempts_to_open = 0;
-    while(1) 
+    while(reader_control) 
     {
         
         confirm_work(READER_ID);
@@ -110,4 +111,8 @@ void reader_set_buffer(char* to_buffer)
     internal_buffer = (char *) calloc(strlen(to_buffer),sizeof(internal_buffer));
     strcpy(internal_buffer,to_buffer);
 
+}
+void stop_reader()
+{
+    reader_control = END_THREAD;
 }

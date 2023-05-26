@@ -17,5 +17,6 @@ void watchdog_init(pthread_t threads_from_main[], int threads_no);
 void* watchdog_task();
 void confirm_work(int thread_ID);
 void stop_threads();
+void stop_watchdog();
 
 #endif

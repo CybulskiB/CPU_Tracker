@@ -13,12 +13,12 @@
 static char* analyzer_internal_buffer = NULL;
 static double cpu_percent[CPU_MAX];
 static int cpu_counter;
-
+int analyzer_control = WORKING;
 
 void* analyzer_task()
 {
 
-    while(1) 
+    while(analyzer_control) 
     {
         confirm_work(ANALYZER_ID);
         get_reader_data_from_buffer();
@@ -81,4 +81,8 @@ void free_analyzer_buffer()
     free(analyzer_internal_buffer);
     analyzer_internal_buffer= NULL;
 
+}
+void stop_analyzer()
+{
+    analyzer_control = END_THREAD;
 }

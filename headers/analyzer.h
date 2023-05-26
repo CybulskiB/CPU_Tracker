@@ -14,5 +14,6 @@ void delete_data_from_reader();
 void free_analyzer_buffer();
 
 void* analyzer_task();
+void stop_analyzer();
 
 #endif

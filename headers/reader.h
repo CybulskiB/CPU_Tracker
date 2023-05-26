@@ -11,5 +11,6 @@ void reader_set_buffer(char* to_buffer);
 void free_reader_buffer();
 
 void* reader_task();
+void stop_reader();
 
 #endif

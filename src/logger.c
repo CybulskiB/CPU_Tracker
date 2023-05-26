@@ -11,10 +11,11 @@
 
 static char* logger_internal_buffer = NULL;
 static FILE* log_file;
+int logger_control = WORKING;
 
 void* logger_task()
 {
-    while(1)
+    while(logger_control)
     {
         confirm_work(LOGGER_ID);
         get_logs();
@@ -30,7 +31,7 @@ void* logger_task()
                 fprintf(log_file,"%s\n",logger_internal_buffer);
 
             }
-            free_logger_internal_buffer();
+            free_logger_buffer();
         }
     }
     return NULL;
@@ -40,8 +41,12 @@ void get_logs()
     send_data_to_logger(&logger_internal_buffer);
 }
 
-void free_logger_internal_buffer()
+void free_logger_buffer()
 {
     free(logger_internal_buffer);
     logger_internal_buffer = NULL;
+}
+void stop_logger()
+{
+    logger_control = END_THREAD;
 }
