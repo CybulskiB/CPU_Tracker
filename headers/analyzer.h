@@ -6,6 +6,12 @@
 #define START_COUNT_CPU -1
 //To store usage in processor in percent 
 #define TO_PERCENT 100
+#define PREV_INIT 0
+#define CURR_INIT -1
+#define EXP_NO_INFOS 10
+#define NUM_BASE 10
+#define FIRST 1
+#define NEXT 0
 
 void send_analyzer_to_buffer();
 void get_reader_data_from_buffer();
@@ -13,7 +19,9 @@ void analyze_data();
 void delete_data_from_reader();
 void free_analyzer_buffer();
 
+void set_prev(int position);
 void* analyzer_task();
 void stop_analyzer();
+void set_curr(char* cpu_line);
 
 #endif

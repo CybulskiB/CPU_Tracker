@@ -12,7 +12,7 @@ endif
 
 all: main.out
 
-func_test: functionality.out
+test: functionality.out
 
 
 main.out:

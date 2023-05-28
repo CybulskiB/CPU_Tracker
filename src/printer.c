@@ -34,6 +34,7 @@ void print_data()
     
     //Print data
     if(cpu_counter >0){
+        printf("Total cpu core's Usage %.2f%% \n",cpu_to_print[0]);
         for(int i =1; i <= cpu_counter; i++)
         {
             printf("Cpu's core: %d,  Usage: %.2f%% \n", i,cpu_to_print[i]);

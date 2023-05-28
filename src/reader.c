@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <unistd.h>
 //Includes from my headers
 #include "../headers/reader.h"
 #include "../headers/global.h"
@@ -40,6 +41,7 @@ void* reader_task()
                 attempts_to_open +=1;
             }
         }
+        sleep(1);
     }
     return NULL;
 }
