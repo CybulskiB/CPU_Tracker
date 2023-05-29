@@ -4,6 +4,4 @@
 #define WAIT_BEFORE_WATCHDOG 1
 #define WAIT_BEFORE_STOP 5
 
-
-
 #endif

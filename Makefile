@@ -4,10 +4,10 @@ SRC := $(wildcard ./src/*.c)
 
 CC ?= gcc
 
-C_FLAGS := -Wall -Wextra -g -std=c99
+C_FLAGS := -Wall -Wextra -gdwarf-4 -std=c99
 
 ifeq ($(CC),clang)
-	C_FLAGS += -Weverything -Wno-disabled-macro-expansion
+	C_FLAGS += -Weverything -Wno-disabled-macro-expansion 
 endif
 
 all: main.out
