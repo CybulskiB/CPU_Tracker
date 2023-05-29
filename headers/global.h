@@ -10,6 +10,7 @@
 
 #define END_THREAD 0
 #define WORKING 1
+#define ALL_THREADS 5
 
 
 #endif

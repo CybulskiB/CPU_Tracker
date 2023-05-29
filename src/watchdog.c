@@ -10,6 +10,7 @@
 #include "../headers/global.h"
 #include "../headers/watchdog.h"
 #include "../headers/logger.h"
+#include "../headers/printer.h"
 
 int watchdog_working = CONFIRMED;
 static int threads_alive[THREADS_TO_WATCH];
@@ -34,9 +35,8 @@ void* watchdog_task()
         sleep(TIME_TO_CHECK);
         for(int i =0; i< THREADS_TO_WATCH; i++)
         {
-            if(threads_alive[i] == NON_CONFIRMED)
+            if(threads_alive[i] == NON_CONFIRMED && watchdog_working == CONFIRMED)
             {
-                stop_watchdog();
                 error_message = (char *) malloc(sizeof(char*) *ERROR_MESSAGE_SIZE);
                 sprintf(error_message,"Error: thread %d didn't confirm work", i);
                 save_logger_data(error_message);
@@ -61,10 +61,18 @@ void confirm_work(int thread_ID)
 }
 void stop_threads()
 {
+    stop_reader();
+    stop_analyzer();
+    stop_watchdog();
+    stop_logger();
+    stop_printer();
+    sleep(1);
+   
     for(int i = 0; i< THREADS_TO_WATCH; i++)
     {
         pthread_cancel(threads[i]);
     }
+    
     free_reader_buffer();
     free_analyzer_buffer();
     free_logger_buffer();

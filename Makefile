@@ -12,14 +12,15 @@ endif
 
 all: main.out
 
-test: functionality.out
+test: test.out
 
 
 main.out:
 	$(CC) $(C_FLAGS) -Iinc ./app/main.c $(SRC) -o "cpu_tracker.out" -pthread
 
-functionality.out:
+test.out:
 	$(CC) $(C_FLAGS) -Iinc ./test/functionality.c $(SRC) -o "func_test.out" -pthread
-
+	$(CC) $(C_FLAGS) -Iinc ./test/watchdog_memory_check.c $(SRC) -o "watchdog_memcheck.out" -pthread
+	
 clean:
 	$(RM) main.out

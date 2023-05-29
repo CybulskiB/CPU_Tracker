@@ -89,10 +89,10 @@ int read_data()
         
         }
         free(line);
-        line = NULL;
-        fclose(file_info);
-        return SUCCESS;        
+        line = NULL;      
     }
+    fclose(file_info);
+    return SUCCESS;  
 }
 
 //Sending data to analyzer

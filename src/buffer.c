@@ -61,18 +61,23 @@ void destroy_buffer()
         for(int i = ra_queue->front; i<= ra_queue->rear; i++)
         {
             free(ra_queue->data_from_reader[i]);
+            ra_queue->data_from_reader[i] = NULL;
         }
     }
     free(ra_queue);
+    ra_queue = NULL;
     free(ap_queue);
+    ap_queue = NULL;
     if(log_queue->front <= log_queue->rear && log_queue-> front != -1 && log_queue->rear != -1)
     {
         for(int i = log_queue->front; i<= log_queue->rear; i++)
         {
             free(log_queue->data_to_logger[i]);
+            log_queue->data_to_logger[i] = NULL;
         }
     }
     free(log_queue);
+    log_queue = NULL;
     sem_destroy(&reader_analyzer_empty);
     sem_destroy(&reader_analyzer_filled);
     sem_destroy(&analyzer_printer_empty);
@@ -160,6 +165,7 @@ void send_data_to_analyzer(char** reference_to_analyzer_buffer)
         *reference_to_analyzer_buffer = (char *) calloc(strlen(ra_queue->data_from_reader[ra_queue->front]),sizeof(reference_to_analyzer_buffer));
         strncpy(*reference_to_analyzer_buffer,ra_queue->data_from_reader[ra_queue->front],strlen(ra_queue->data_from_reader[ra_queue->front]));
         free(ra_queue->data_from_reader[ra_queue->front]);
+        ra_queue->data_from_reader[ra_queue->front] = NULL;
         ra_queue->front++;
     }
     pthread_mutex_unlock(&reader_analyzer_mutex);
@@ -201,6 +207,7 @@ void refactor_ra_queue()
             ra_queue->data_from_reader[i] = (char *) calloc(strlen(ra_queue->data_from_reader[ra_queue->front +i]), sizeof(ra_queue->data_from_reader[i]));
             strcpy(ra_queue->data_from_reader[i], ra_queue->data_from_reader[ra_queue->front +i]);
             free(ra_queue->data_from_reader[ra_queue->front +i]);
+            ra_queue->data_from_reader[ra_queue->front +i] = NULL;
             pos =i;
         }
         ra_queue->front =0;
@@ -236,6 +243,7 @@ void send_data_to_logger(char** reference_to_logger_buffer)
         *reference_to_logger_buffer = (char *) calloc(strlen(log_queue->data_to_logger[log_queue->front]),sizeof(reference_to_logger_buffer));
         strncpy(*reference_to_logger_buffer,log_queue->data_to_logger[log_queue->front],strlen(log_queue->data_to_logger[log_queue->front]));
         free(log_queue->data_to_logger[log_queue->front]);
+        log_queue->data_to_logger[log_queue->front] = NULL;
         log_queue->front++;
         pthread_mutex_unlock(&logger_queue_mutex);
         sem_post(&logger_empty);
@@ -291,6 +299,7 @@ void refactor_log_queue()
             log_queue->data_to_logger[i] = (char *) calloc(strlen(log_queue->data_to_logger[log_queue->front +i]), sizeof(log_queue->data_to_logger[i]));
             strcpy(log_queue->data_to_logger[i], log_queue->data_to_logger[log_queue->front +i]);
             free(log_queue->data_to_logger[log_queue->front +i]);
+            log_queue->data_to_logger[log_queue->front +i] = NULL;
             pos =i;
         }
         log_queue->front =0;

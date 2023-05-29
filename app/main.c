@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <signal.h>
 #include <unistd.h>
+#include <string.h>
 //Includes from my headers
 #include "../headers/analyzer.h"
 #include "../headers/global.h"
@@ -12,82 +13,51 @@
 #include "../headers/watchdog.h"
 #include "../headers/logger.h"
 static pthread_t reader, analyzer, printer, logger, watchdog;
-static void terminate(int signum);
+static void* (*threads_functions[ALL_THREADS])(void *) = {&reader_task,&analyzer_task,&printer_task,&logger_task,&watchdog_task};
+
+void terminate(int signum)
+{
+    if(signum == SIGTERM || signum == SIGINT){
+        printf("Received a signal %d \n", signum);
+        stop_threads();
+        
+    }
+}
+
 
 int main()
 {
     signal(SIGTERM, *terminate);
+    signal(SIGINT, *terminate);
     printf("%d\n", getpid());
     init_buffer();
 
-    if(pthread_create(&reader,NULL,reader_task,NULL) != 0)
+    pthread_t threads_to_watch[THREADS_TO_WATCH];
+    pthread_t threads[ALL_THREADS] = {reader,analyzer,printer,logger,watchdog};
+    for(size_t i = 0; i < ALL_THREADS; i++)
     {
-        perror("Failed to create reader thread");
-    }
-    if(pthread_create(&analyzer,NULL,analyzer_task,NULL) != 0)
-    {
-        perror("Failed to create analyzer thread");
-    }
-    if(pthread_create(&printer,NULL,printer_task,NULL) != 0)
-    {
-        perror("Failed to create printer thread");
-    }
-    if(pthread_create(&logger,NULL,logger_task,NULL) != 0)
-    {
-        perror("Faile to create logger thread");
-    }
-
-    pthread_t thread_to_watch[THREADS_TO_WATCH] = {reader,analyzer,printer,logger};
-    watchdog_init(thread_to_watch,THREADS_TO_WATCH);
-
-    if(pthread_create(&watchdog,NULL,watchdog_task,NULL) != 0)
-    {
-        perror("Failed to create watchdog thread");
+        if( i == THREADS_TO_WATCH )
+        {
+            memcpy(threads_to_watch,threads,sizeof(pthread_t) * THREADS_TO_WATCH);
+            watchdog_init(threads_to_watch,THREADS_TO_WATCH);
+        }
+        if(pthread_create(&threads[i],NULL,threads_functions[i], NULL) != 0)
+        {
+            perror("Failed to create threads");
+        }
     }
 
    
-    if(pthread_join(reader,NULL) != 0)
+    for(size_t i = 0; i < ALL_THREADS; i++)
     {
-        perror("Failed to join reader thread");
-    }
-    if(pthread_join(analyzer,NULL) != 0)
-    {
-        perror("Failed to join analyzer thread");
-    }
-    if(pthread_join(printer,NULL) != 0)
-    {
-        perror("Failed to join printer thread");
-    }
-     if(pthread_join(logger,NULL) != 0)
-    {
-        perror("Faile to join logger thread");
-    }
-    if(pthread_join(watchdog,NULL) != 0)
-    {
-        perror("Failed to join watchdog thread");
+        if(pthread_join(threads[i],NULL) != 0)
+        {
+            perror("Failed to join all threads");
+        }
     }
 
     destroy_buffer();
 
     return 0;
 }
-void terminate(int signum)
-{
-    if(signum == SIGTERM){
-        printf("Received a signal %d", signum);
-        pthread_cancel(watchdog);
-        pthread_cancel(reader);
-        pthread_cancel(logger);
-        pthread_cancel(analyzer);
-        pthread_cancel(printer);
-        stop_reader();
-        stop_analyzer();
-        stop_watchdog();
-        stop_logger();
-        stop_printer();
-        free_reader_buffer();
-        free_analyzer_buffer();
-        free_logger_buffer();
-        
-    }
-}
+

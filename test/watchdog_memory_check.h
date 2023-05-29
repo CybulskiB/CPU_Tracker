@@ -1,0 +1,9 @@
+#ifndef WATCHDOG_MEMORY_CHECK_H
+#define WATCHDOG_MEMORY_CHECK_H
+
+#define WAIT_BEFORE_WATCHDOG 1
+#define WAIT_BEFORE_STOP 5
+
+
+
+#endif
