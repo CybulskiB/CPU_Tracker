@@ -42,7 +42,7 @@ void *reader_task(void *arg) {
 
 int read_data(void) {
   FILE *file_info;
-  internal_buffer = (char *)calloc(LINE_MAX_LENGHT, sizeof(char));
+  internal_buffer = (char *)calloc(CPU_MAX * LINE_MAX_LENGHT, sizeof(char));
 
   if (internal_buffer == NULL) {
     save_logger_data(

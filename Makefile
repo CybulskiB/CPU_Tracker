@@ -7,7 +7,7 @@ CC ?= gcc
 C_FLAGS := -Wall -Wextra -gdwarf-4 -std=c99
 
 ifeq ($(CC),clang)
-	C_FLAGS += -Weverything -Wno-disabled-macro-expansion 
+	C_FLAGS += -Weverything
 endif
 
 all: main.out

@@ -60,7 +60,7 @@ void analyze_data(void) {
     if (cpu_counter != CPU_TOTAL) {
       cpu_use_info = strtok(NULL, INFO_SEPARATOR);
     }
-    if (set_curr(cpu_use_info) < 8) {
+    if (set_curr(cpu_use_info) < GUEST_POS) {
       save_logger_data(
           "Error: Analyzer got too little information in set_curr()");
       stop_analyzer();
